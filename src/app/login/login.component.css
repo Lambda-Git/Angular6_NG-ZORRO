@@ -1,0 +1,56 @@
+/*登录背景颜色*/
+::ng-deep body {
+  background-color: #e4e5e6;
+}
+
+div.login {
+  padding-top: 180px;
+}
+
+div.left {
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #fff;
+  height: 300px;
+}
+
+from.login-form {
+  margin-top: 15px;
+}
+
+div.button {
+  margin-top: 10px;
+}
+
+div.info {
+  text-align: center;
+  padding: 20px;
+  border-radius: 5px;
+  background-color: #20a8d8;
+  height: 300px;
+}
+
+div.info h3 {
+  margin-bottom: 50px;
+  margin-top: 40px;
+}
+
+div.img_code img {
+  margin-left: 29px;
+  margin-top: 4px;
+}
+
+div.logo_img img {
+  width: 80%;
+}
+
+.login-form-forgot {
+  float: right;
+}
+
+.login-form-button {
+  width: 80%;
+}
+.login-form-reset{
+  width: 80%;
+}

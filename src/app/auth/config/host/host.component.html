@@ -1,0 +1,222 @@
+<!--面包屑--当前模块路径-->
+<div class="components-table-demo-control-bar">
+  <form nz-form nzLayout="inline">
+    <div nz-row>
+      <div nz-col nzSpan="12">
+        <nz-breadcrumb>
+          <nz-breadcrumb-item>
+            <i nz-icon type="home"></i>
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            配置管理
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            配置主机
+          </nz-breadcrumb-item>
+        </nz-breadcrumb>
+      </div>
+    </div>
+
+  </form>
+</div>
+<!--查询条件框-->
+<div class="searchGroup">
+  <form nz-form [formGroup]="searchForm" class="ant-advanced-search-form">
+    <div nz-row [nzGutter]="24">
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>主机名</nz-form-label>
+          <nz-form-control>
+            <input nz-input placeholder="主机名" formControlName="name" (change)="getHosts()">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>主机ip</nz-form-label>
+          <nz-form-control>
+            <input nz-input placeholder="主机ip" formControlName="ip" (change)="getHosts()">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+</div>
+<!--list表单table-->
+<div class="form_table">
+  <nz-table
+    #dynamicTable
+    (nzCurrentPageDataChange)="currentPageDataChange($event)"
+    [nzScroll]="fixHeader?{ y: '240px' }:null"
+    [nzData]="dataSet"
+    [nzBordered]="bordered"
+    [nzSimple]="simple"
+    [nzLoading]="loading"
+    [nzFrontPagination]="pagination"
+    [nzShowPagination]="pagination"
+    [nzSize]="size"
+    [nzPageIndex]="page.pageNum"
+    [nzTotal]="page.totalElements"
+    [nzPageSize]="page.pageSize"
+  >
+    <thead>
+    <tr *ngIf="header">
+      <th nzWidth="62px" nzShowCheckbox *ngIf="checkbox" [(nzChecked)]="allChecked" [nzIndeterminate]="indeterminate"
+          (nzCheckedChange)="checkAll($event)"></th>
+      <th>主机名</th>
+      <th>主机ip</th>
+      <th>域名</th>
+      <th>主机类型</th>
+      <th>主机创建时间</th>
+      <th>主机创建人</th>
+      <th>
+        <button nz-button (click)="showModal()" nzType="primary" [nzSize]="size"><i nz-icon type="plus"
+                                                                                    theme="outline"></i>增加
+        </button>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-template ngFor let-data [ngForOf]="dynamicTable.data">
+      <tr>
+        <td nzShowCheckbox *ngIf="checkbox" [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+        <td>{{data.name}}</td>
+        <td>{{data.ip}}</td>
+        <td>{{data.domain}}</td>
+        <td>{{data.type}}</td>
+        <td>{{data.createDate | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+        <td>{{data.createBy}}</td>
+        <td>
+          <i nz-icon nzTitle="编辑" (click)="showModal(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+             class="editIcon"></i>
+          <nz-divider nzType="vertical"></nz-divider>
+          <i nz-icon nzTitle="删除" (click)="doDel(data)" nzPlacement="topCenter" nz-tooltip type="delete" theme="fill"
+             class="delIcon"></i>
+          <nz-divider nzType="vertical"></nz-divider>
+          <i nz-icon nzTitle="容器查询" (click)="showContainer(data)" nzPlacement="topCenter" nz-tooltip type="search"
+             style="font-size: 18px;color: #1261ad"></i>
+        </td>
+      </tr>
+    </ng-template>
+    </tbody>
+  </nz-table>
+</div>
+
+<!--增加、编辑弹框组件-->
+<div>
+  <nz-modal
+    [(nzVisible)]="isVisible"
+    [nzTitle]="modalTitle"
+    [nzContent]="modalContent"
+    [nzFooter]="modalFooter"
+    (nzOnCancel)="handleCancel()"
+    [nzMaskClosable]="false">
+    <ng-template #modalTitle>
+      {{isNew?'新增主机':'编辑主机'}}
+    </ng-template>
+
+    <ng-template #modalContent>
+      <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm($event,validateForm.value)">
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>主机名称</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <input nz-input formControlName="name" placeholder="主机名称">
+            <nz-form-explain
+              *ngIf="validateForm.get('name').dirty && validateForm.get('name').hasError('required')">
+              <span class="valMessage">请输入主机名称!</span>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">ip地址</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <input nz-input formControlName="ip" placeholder="ip地址">
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">域名</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <input nz-input formControlName="domain" placeholder="域名">
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </ng-template>
+
+    <ng-template #modalFooter>
+      <button nz-button (click)="resetForm($event)">重置</button>
+      <button nz-button nzType="primary" [disabled]="!validateForm.valid" (click)="doSave()">提交</button>
+    </ng-template>
+  </nz-modal>
+</div>
+
+<!--根据主机查询容器列表-->
+<div>
+  <nz-modal
+    [(nzVisible)]="isContainerVisible"
+    [nzTitle]="modaContainerlTitle"
+    [nzContent]="modalContainerContent"
+    [nzFooter]="modalContainerFooter"
+    (nzOnCancel)="handleContainerCancel()"
+    [nzWidth]="800"
+    [nzMaskClosable]="false">
+    <ng-template #modaContainerlTitle>
+      {{hostName}}容器列表
+    </ng-template>
+    <ng-template #modalContainerContent>
+      <div class="form_table">
+        <nz-table
+          #containerTable
+          (nzCurrentPageDataChange)="currentPageDataChange($event)"
+          [nzScroll]="fixHeader?{ y: '240px' }:null"
+          [nzData]="dataContainerSet"
+          [nzBordered]="bordered"
+          [nzSimple]="simple"
+          [nzLoading]="loading"
+          [nzFrontPagination]="pagination"
+          [nzShowPagination]="pagination"
+          [nzSize]="size"
+          [nzPageIndex]="page.pageNum"
+          [nzTotal]="page.totalElements"
+          [nzPageSize]="page.pageSize"
+        >
+          <thead>
+          <tr *ngIf="header">
+            <th nzShowExpand></th>
+            <th>镜像</th>
+            <th>命令</th>
+            <th>运行时间</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <ng-template ngFor let-data [ngForOf]="containerTable.data">
+            <tr>
+              <td nzShowExpand [(nzExpand)]="data.expand"></td>
+              <td>{{data.image}}</td>
+              <td>{{data.command}}</td>
+              <td>{{data.status}}</td>
+              <td>{{data.state}}</td>
+              <td>
+                <i nz-icon nzTitle="重新启动" (click)="reboot(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+                   class="editIcon"></i>
+                <nz-divider nzType="vertical"></nz-divider>
+                <i nz-icon nzTitle="杀死" (click)="kill(data)" nzPlacement="topCenter" nz-tooltip type="delete" theme="fill"
+                   class="delIcon"></i>
+              </td>
+            </tr>
+            <tr [nzExpand]="data.expand">
+              <td></td>
+              <td colspan="5">{{data.description}}</td>
+            </tr>
+          </ng-template>
+          </tbody>
+        </nz-table>
+      </div>
+
+    </ng-template>
+    <ng-template #modalContainerFooter style="display: none">
+
+    </ng-template>
+  </nz-modal>
+</div>

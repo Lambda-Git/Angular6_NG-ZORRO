@@ -1,0 +1,372 @@
+<!--面包屑--当前模块路径-->
+<div class="components-table-demo-control-bar">
+  <form nz-form nzLayout="inline">
+    <div nz-row>
+      <div nz-col nzSpan="12">
+        <nz-breadcrumb>
+          <nz-breadcrumb-item>
+            <i nz-icon type="home"></i>
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            容器配置管理
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            配置容器
+          </nz-breadcrumb-item>
+        </nz-breadcrumb>
+      </div>
+    </div>
+
+  </form>
+</div>
+<nz-tabset>
+  <nz-tab nzTitle="ca列表">
+    <!--ca表单table-->
+    <div class="form_table">
+      <nz-table
+        #caDynamicTable
+        (nzCurrentPageDataChange)="currentPageDataChange($event)"
+        [nzScroll]="fixHeader?{ y: '240px' }:null"
+        [nzData]="caDataSet"
+        [nzBordered]="bordered"
+        [nzSimple]="simple"
+        [nzLoading]="loading"
+        [nzFrontPagination]="pagination"
+        [nzShowPagination]="pagination"
+        [nzSize]="size"
+      >
+        <thead>
+        <tr *ngIf="header">
+          <th>ca名称</th>
+          <th>容器名称</th>
+          <th>加密通信</th>
+          <th>调试模式</th>
+          <th>启动端口</th>
+          <th>管理员用户名</th>
+          <th>管理员密码</th>
+          <th>
+            <button nz-button (click)="showCaModal()" nzType="primary" [nzSize]="size"><i nz-icon type="plus"
+             theme="outline"></i>增加ca
+            </button>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-template ngFor let-data [ngForOf]="caDynamicTable.data">
+          <tr>
+            <td>{{data.name}}</td>
+            <td>{{data.containerName}}</td>
+            <td>{{data.tls}}</td>
+            <td>{{data.debug}}</td>
+            <td>{{data.port}}</td>
+            <td>{{data.admin}}</td>
+            <td>{{data.adminpw}}</td>
+            <td>
+              <i *ngIf="data.containerID == ''" nz-icon nzTitle="编辑" (click)="showCaModal(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+                 class="editIcon"></i>
+              <nz-divider nzType="vertical"></nz-divider>
+              <i *ngIf="data.containerID == ''" nz-icon nzTitle="启动" (click)="turnCaOn(data)" nzPlacement="topCenter" nz-tooltip type="caret-right" theme="outline"></i>
+            </td>
+          </tr>
+        </ng-template>
+        </tbody>
+      </nz-table>
+    </div>
+
+    <!--ca增加、编辑弹框组件-->
+    <div>
+      <nz-modal
+        [(nzVisible)]="isCaVisible"
+        [nzTitle]="modalTitle"
+        [nzContent]="modalContent"
+        [nzFooter]="modalFooter"
+        (nzOnCancel)="handleCaCancel()"
+        [nzMaskClosable]="false">
+        <ng-template #modalTitle>
+          {{isCaNew?'新增ca':'编辑ca'}}
+        </ng-template>
+
+        <ng-template #modalContent>
+          <form nz-form [formGroup]="validateFormCa" (ngSubmit)="submitForm($event,validateFormCa.value)">
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>ca名称</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="name" placeholder="ca名称">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">容器名称</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="containerName" placeholder="容器名称">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>加密通信</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="tlsOptionsCa" formControlName="tls"></nz-cascader>
+                <!--<nz-form-explain *ngIf="validateForm.get('role').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>-->
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>调试模式</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="debugOptionsCa" formControlName="debug"></nz-cascader>
+                <!--<nz-form-explain *ngIf="validateForm.get('role').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>-->
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">启动端口</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="port" placeholder="启动端口">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">管理员用户名</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="admin" placeholder="管理员用户名">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">管理员密码</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="adminpw" placeholder="管理员密码">
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </ng-template>
+
+        <ng-template #modalFooter>
+          <button nz-button (click)="resetForm($event)">重置</button>
+          <button nz-button nzType="primary" [disabled]="!validateFormCa.valid" (click)="doCaSave()">提交</button>
+        </ng-template>
+      </nz-modal>
+    </div>
+
+  </nz-tab>
+  <nz-tab nzTitle="peer列表">
+    <!--peer、couchdb表单table-->
+    <div class="form_table">
+      <nz-table
+        #peerDynamicTable
+        (nzCurrentPageDataChange)="currentPageDataChange($event)"
+        [nzScroll]="fixHeader?{ y: '240px' }:null"
+        [nzData]="peerDataSet"
+        [nzBordered]="bordered"
+        [nzSimple]="simple"
+        [nzLoading]="loading"
+        [nzFrontPagination]="pagination"
+        [nzShowPagination]="pagination"
+        [nzSize]="size"
+      >
+        <thead>
+        <tr *ngIf="header">
+          <th>容器名称</th>
+          <th>开启debug</th>
+          <th>开启ccDebug</th>
+          <th>单向加密通信</th>
+          <th>开启客户端认证</th>
+          <th>anchorPeer</th>
+          <th>智能合约端口</th>
+          <th>智能合约端口</th>
+          <th>事件端口</th>
+          <th>couchdb用户名</th>
+          <th>couchdb密码</th>
+          <th>couchdb服务端口</th>
+          <th>couchdb容器名称</th>
+          <th>
+            <button nz-button (click)="showPeerModal()" nzType="primary" [nzSize]="size"><i nz-icon type="plus"
+                                                                                          theme="outline"></i>增加peer
+            </button>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-template ngFor let-data [ngForOf]="peerDynamicTable.data">
+          <tr>
+            <td>{{data.containerName}}</td>
+            <td>
+              <div *ngIf="data.debug == true">是
+              </div>
+              <div *ngIf="data.debug == false">否
+              </div>
+            </td>
+            <td>
+              <div *ngIf="data.ccDebug == true">是
+              </div>
+              <div *ngIf="data.ccDebug == false">否
+              </div>
+            </td>
+            <td>
+              <div *ngIf="data.tls == true">是
+              </div>
+              <div *ngIf="data.tls == false">否
+              </div>
+            </td>
+            <td>
+              <div *ngIf="data.clientAuthEnable == true">是
+              </div>
+              <div *ngIf="data.ccDclientAuthEnableebug == false">否
+              </div>
+            </td>
+            <td>
+              <div *ngIf="data.anchorPeer == true">是
+              </div>
+              <div *ngIf="data.anchorPeer == false">否
+              </div>
+            </td>
+            <td>{{data.servicePort}}</td>
+            <td>{{data.ccPort}}</td>
+            <td>{{data.eventPort}}</td>
+            <td>{{data.couchdbUsername}}</td>
+            <td>{{data.couchdbPassword}}</td>
+            <td>{{data.port}}</td>
+            <td>{{data.couchdbContainerName}}</td>
+            <td>
+              <i *ngIf="data.containerID == ''" nz-icon nzTitle="编辑" (click)="showPeerModal(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+                 class="editIcon"></i>
+              <nz-divider nzType="vertical"></nz-divider>
+              <i *ngIf="data.containerID == ''" nz-icon nzTitle="启动" (click)="turnPeerOn(data)" nzPlacement="topCenter" nz-tooltip type="caret-right" theme="outline"></i>
+            </td>
+          </tr>
+        </ng-template>
+        </tbody>
+      </nz-table>
+    </div>
+
+    <!--peer、couchdb增加、编辑弹框组件-->
+    <div>
+      <nz-modal
+        [(nzVisible)]="isPeerVisible"
+        [nzTitle]="modalPeerTitle"
+        [nzContent]="modalPeerContent"
+        [nzFooter]="modalPeerFooter"
+        (nzOnCancel)="handlePeerCancel()"
+        [nzMaskClosable]="false">
+        <ng-template #modalPeerTitle>
+          {{isPeerNew?'新增peer':'编辑peer'}}
+        </ng-template>
+
+        <ng-template #modalPeerContent>
+          <form nz-form [formGroup]="validateFormPeer" (ngSubmit)="submitForm($event,validateFormPeer.value)">
+            <!--peer-->
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>容器名称</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="containerName" placeholder="容器名称">
+                <nz-form-explain
+                  *ngIf="validateFormPeer.get('containerName').dirty && validateFormPeer.get('containerName').hasError('required')">
+                  <span class="valMessage">容器名称不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>开启debug</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="debugOptionsPeer" formControlName="debug"></nz-cascader>
+                <nz-form-explain
+                  *ngIf="validateFormPeer.get('debug').dirty && validateFormPeer.get('debug').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>开启ccDebug</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="ccDebugOptionsPeer" formControlName="ccDebug"></nz-cascader>
+                <nz-form-explain
+                  *ngIf="validateFormPeer.get('ccDebug').dirty && validateFormPeer.get('ccDebug').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>单项加密通信</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="tlsOptionsPeer" formControlName="tls"></nz-cascader>
+                <nz-form-explain
+                  *ngIf="validateFormPeer.get('tls').dirty && validateFormPeer.get('tls').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>开启客户端认证</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="cliOptionsPeer" formControlName="clientAuthEnable"></nz-cascader>
+                <nz-form-explain
+                  *ngIf="validateFormPeer.get('clientAuthEnable').dirty && validateFormPeer.get('clientAuthEnable').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>anchorPeer</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="anchorOptionsPeer" formControlName="anchorPeer"></nz-cascader>
+                <nz-form-explain
+                  *ngIf="validateFormPeer.get('anchorPeer').dirty && validateFormPeer.get('anchorPeer').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">服务端口</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="servicePort" placeholder="服务端口">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">智能合约端口</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="ccPort" placeholder="智能合约端口">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">事件端口</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="eventPort" placeholder="事件端口">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-tag>couchdb</nz-tag>
+            <hr>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">couchdb用户名</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="couchdbUsername" placeholder="couchdb用户名">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">couchdb密码</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="couchdbPassword" placeholder="couchdb密码">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">服务端口</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="port" placeholder="服务端口">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">couchdb容器名称</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="couchdbContainerName" placeholder="couchdb容器名称">
+              </nz-form-control>
+            </nz-form-item>
+
+          </form>
+        </ng-template>
+
+        <ng-template #modalPeerFooter>
+          <button nz-button (click)="resetForm($event)">重置</button>
+          <button nz-button nzType="primary" [disabled]="!validateFormPeer.valid" (click)="doPeerSave()">提交</button>
+        </ng-template>
+      </nz-modal>
+    </div>
+
+  </nz-tab>
+</nz-tabset>

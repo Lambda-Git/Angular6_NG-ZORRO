@@ -1,0 +1,55 @@
+.layout{
+  height: 100%;
+}
+nz-header{
+  background: #1261ad;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 100;
+  line-height: 57px;
+}
+nz-header .ant-menu-horizontal {
+  line-height: 59px;
+  /*border-bottom: none;*/
+}
+nz-header ul{
+  background: #1261ad;
+}
+.logo {
+  width: 120px;
+  height: 31px;
+  float: left;
+  margin-left: 30px;
+}
+div.saas-peer-body{
+  padding-top: 30px;
+  padding-left: 60px;
+  padding-right: 60px;
+}
+nz-header .ant-menu-item > a{
+  font-size: 18px;
+  color: #FFFFFF;
+}
+nz-header li.home:hover{
+  background-color: #09172b;
+}
+nz-header li.userInfo{
+  color: #ffffff;
+  float: right;
+  margin-right: 60px
+}
+nz-header li.userInfo:hover{
+  background-color: #09172b;
+}
+nz-header .ant-menu-submenu:hover{
+  background-color: #09172b;
+}
+span.titles{
+  font-size: 18px;
+  color: #FFFFFF;
+}
+span.titles:hover{
+  color: #FFFFFF;
+}

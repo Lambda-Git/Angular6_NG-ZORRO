@@ -1,0 +1,276 @@
+<!--面包屑--当前模块路径-->
+<div class="components-table-demo-control-bar">
+  <form nz-form nzLayout="inline">
+    <div nz-row>
+      <div nz-col nzSpan="12">
+        <nz-breadcrumb>
+          <nz-breadcrumb-item>
+            <i nz-icon type="home"></i>
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            配置管理
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            配置身份
+          </nz-breadcrumb-item>
+        </nz-breadcrumb>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<nz-tabset>
+  <nz-tab nzTitle="我的身份">
+    <!--list表单table-->
+    <div class="form_table">
+      <nz-table
+        #dynamicTable
+        (nzCurrentPageDataChange)="currentPageDataChange($event)"
+        [nzScroll]="fixHeader?{ y: '240px' }:null"
+        [nzData]="dataSet"
+        [nzBordered]="bordered"
+        [nzSimple]="simple"
+        [nzLoading]="loading"
+        [nzFrontPagination]="pagination"
+        [nzShowPagination]="pagination"
+        [nzSize]="size"
+      >
+        <thead>
+        <tr *ngIf="header">
+          <th>名称</th>
+          <th>域名</th>
+          <th>所属国家</th>
+          <th>州名或省名</th>
+          <th>单位名称</th>
+          <th>所在部门</th>
+          <th>是否为主</th>
+          <th>是否被使用</th>
+          <th>
+            <button nz-button (click)="showModal()" nzType="primary" [nzSize]="size"><i nz-icon type="plus"
+                                                                                        theme="outline"></i>增加身份
+            </button>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-template ngFor let-data [ngForOf]="dynamicTable.data">
+          <tr>
+            <td>{{data.name}}</td>
+            <td>{{data.commonName}}</td>
+            <td>{{data.country}}</td>
+            <td>{{data.state}}</td>
+            <td>{{data.locality}}</td>
+            <td>{{data.organizationName}}</td>
+            <td>{{data.organizationUnit}}</td>
+            <td>
+              <div *ngIf="data.root == true">是
+              </div>
+              <div *ngIf="data.root == false">否
+              </div>
+            </td>
+            <td>
+              <div *ngIf="data.use == true">是
+              </div>
+              <div *ngIf="data.use == false">否
+              </div>
+            </td>
+            <td>
+              <i nz-icon nzTitle="更新身份" (click)="showModal(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+                 class="editIcon"></i>
+              <nz-divider nzType="vertical"></nz-divider>
+            </td>
+          </tr>
+        </ng-template>
+        </tbody>
+      </nz-table>
+    </div>
+
+    <!--增加、编辑弹框组件-->
+    <div>
+      <nz-modal
+        [(nzVisible)]="isVisible"
+        [nzTitle]="modalTitle"
+        [nzContent]="modalContent"
+        [nzFooter]="modalFooter"
+        (nzOnCancel)="handleCancel()"
+        [nzMaskClosable]="false">
+        <ng-template #modalTitle>
+          {{isNew?'新增身份':'编辑身份'}}
+        </ng-template>
+
+        <ng-template #modalContent>
+          <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm($event,validateForm.value)">
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>身份名称</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="name" placeholder="身份名称">
+                <nz-form-explain
+                  *ngIf="validateForm.get('name').dirty && validateForm.get('name').hasError('required')">
+                  <span class="valMessage">请输入身份名称!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">域名</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="commonName" placeholder="域名">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">所属国家</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="country" placeholder="所属国家">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">州名或省名</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="state" placeholder="州名或省名">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">所属国家</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="country" placeholder="所属国家">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">城市名</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="locality" placeholder="城市名">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">单位名称</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="organizationName" placeholder="单位名称">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7">所在部门</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <input nz-input formControlName="organizationUnit" placeholder="所在部门">
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>是否为主</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="rootOptions" formControlName="root"></nz-cascader>
+                <nz-form-explain *ngIf="validateForm.get('root').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-form-item>
+              <nz-form-label [nzSpan]="7" nzRequired>是否被使用</nz-form-label>
+              <nz-form-control [nzSpan]="12" nzHasFeedback>
+                <nz-cascader [nzOptions]="useOptions" formControlName="use"></nz-cascader>
+                <nz-form-explain *ngIf="validateForm.get('use').hasError('required')">
+                  <span class="valMessage">选项不能为空!</span>
+                </nz-form-explain>
+              </nz-form-control>
+            </nz-form-item>
+          </form>
+        </ng-template>
+
+        <ng-template #modalFooter>
+          <button nz-button (click)="resetForm($event)">重置</button>
+          <button nz-button nzType="primary" [disabled]="!validateForm.valid" (click)="doSave()">提交</button>
+        </ng-template>
+      </nz-modal>
+    </div>
+
+
+  </nz-tab>
+  <nz-tab nzTitle="全网身份">
+    <!--查询条件框-->
+    <div class="searchGroup">
+      <form nz-form [formGroup]="searchForm" class="ant-advanced-search-form">
+        <div nz-row [nzGutter]="24">
+          <div nz-col [nzSpan]="4">
+            <nz-form-item nzFlex>
+              <nz-form-label>用户名</nz-form-label>
+              <nz-form-control>
+                <input nz-input placeholder="组织名称" formControlName="name" (change)="getAllIdentity()">
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div nz-col [nzSpan]="4">
+            <nz-form-item nzFlex>
+              <nz-form-label>类型</nz-form-label>
+              <nz-form-control>
+                <nz-cascader [nzOptions]="typeOptions" (nzSelectionChange)="getAllIdentity()"
+                             formControlName="type"></nz-cascader>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          <div nz-col [nzSpan]="4">
+            <nz-form-item nzFlex>
+              <nz-form-label>用户角色</nz-form-label>
+              <nz-form-control>
+                <nz-cascader [nzOptions]="configOptions" (nzSelectionChange)="getAllIdentity()"
+                             formControlName="config"></nz-cascader>
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!--list表单table-->
+    <div class="form_table">
+      <nz-table
+        #allIdentityTable
+        (nzCurrentPageDataChange)="currentPageDataChange($event)"
+        [nzScroll]="fixHeader?{ y: '240px' }:null"
+        [nzData]="dataSetAll"
+        [nzBordered]="bordered"
+        [nzSimple]="simple"
+        [nzLoading]="loading"
+        [nzFrontPagination]="pagination"
+        [nzShowPagination]="pagination"
+        [nzSize]="size"
+        [nzPageIndex]="page.pageNum"
+        [nzTotal]="page.totalElements"
+        [nzPageSize]="page.pageSize"
+      >
+        <thead>
+        <tr *ngIf="header">
+          <th>组织名称</th>
+          <th>类型</th>
+          <th>配置了MSP</th>
+          <th>创建时间</th>
+          <th>
+            <button nz-button (click)="getAllIdentity()" nzType="primary" [nzSize]="size">
+              <i nz-icon type="reload" theme="outline"></i>刷新
+            </button>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <ng-template ngFor let-data [ngForOf]="allIdentityTable.data">
+          <tr>
+            <td>{{data.name}}</td>
+            <td>{{data.type}}</td>
+            <td>{{data.country}}</td>
+            <td>
+              <div *ngIf="data.config == true">是
+              </div>
+              <div *ngIf="data.config == false">否
+              </div>
+            </td>
+            <td>{{data.createDate}}</td>
+            <td>
+              <i nz-icon nzTitle="更新身份" (click)="showModal(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+                 class="editIcon"></i>
+              <!--<nz-divider nzType="vertical"></nz-divider>-->
+            </td>
+          </tr>
+        </ng-template>
+        </tbody>
+      </nz-table>
+    </div>
+
+  </nz-tab>
+</nz-tabset>
+

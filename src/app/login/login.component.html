@@ -1,0 +1,91 @@
+<div class="login" nz-row>
+  <div nz-col nzSpan="7"></div>
+  <div nz-col nzSpan="10">
+    <div nz-row>
+      <div class="left" nz-col nzSpan="12">
+        <form nz-form [formGroup]="validateForm" class="login-form" (ngSubmit)="submitForm()">
+          <nz-form-item>
+            <nz-form-control nzHasFeedback>
+              <nz-input-group [nzPrefix]="prefixUser">
+                <input type="text" nz-input formControlName="username" placeholder="Admin123">
+              </nz-input-group>
+              <nz-form-explain *ngIf="validateForm.get('username').dirty && validateForm.get('username').hasError('required')">
+                请输入您的用户名！
+              </nz-form-explain>
+              <nz-form-explain *ngIf="validateForm.get('username').hasError('minlength')">
+                用户名至少八位!
+              </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-control nzHasFeedback>
+              <nz-input-group [nzPrefix]="prefixLock">
+                <input type="password" nz-input formControlName="password" placeholder="Admin123">
+              </nz-input-group>
+              <nz-form-explain *ngIf="validateForm.get('password').dirty && validateForm.get('password').errors">
+                请输入您的用户密码！
+              </nz-form-explain>
+            </nz-form-control>
+          </nz-form-item>
+          <div nz-row>
+            <div nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-control nzHasFeedback>
+                  <nz-input-group [nzPrefix]="prefixKey">
+                    <input type="text" nz-input formControlName="code"
+                           class="ng-pristine ng-valid ant-input ng-touched"
+                           placeholder="1234">
+                  </nz-input-group>
+                  <nz-form-explain *ngIf="validateForm.get('code').dirty && validateForm.get('code').hasError('required')">
+                    请输入验证码！
+                  </nz-form-explain>
+                  <nz-form-explain
+                    *ngIf="validateForm.get('code').hasError('minlength') || validateForm.get('code').hasError('maxlength')">
+                    验证码必须为四位
+                  </nz-form-explain>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col nzSpan="12">
+              <div class="img_code">
+                <img [src]="validateCodeUrl" (click)="refreshCode()" title="点击切换">
+              </div>
+            </div>
+          </div>
+          <div class="button" nz-row>
+            <div nz-col nzSpan="4"></div>
+            <div nz-col nzSpan="7">
+              <nz-form-item>
+                <nz-form-control>
+                  <button nz-button class="login-form-reset" [nzType]="'primary'" (click)="validateForm.reset()">重置</button>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col nzSpan="2"></div>
+            <div nz-col nzSpan="7">
+              <nz-form-item>
+                <nz-form-control>
+                  <button nz-button class="login-form-button" [nzType]="'primary'" [disabled]="!validateForm.valid">登录</button>
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col nzSpan="4"></div>
+          </div>
+        </form>
+        <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
+        <ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
+        <ng-template #prefixKey><i nz-icon type="key"></i></ng-template>
+      </div>
+      <div class="info" nz-col nzSpan="12">
+        <div class="logo_img">
+          <img src="../../assets/images/banner.png"/>
+        </div>
+        <h3 fxFlexOffset="50px">构建与管理您的区块链网络</h3>
+        <div class="copyright">
+          Copyright&copy; 2018-2024 北京宏链科技有限公司
+        </div>
+      </div>
+    </div>
+  </div>
+  <div nz-col nzSpan="7"></div>
+</div>

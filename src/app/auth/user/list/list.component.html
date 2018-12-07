@@ -1,0 +1,201 @@
+<!--面包屑--当前模块路径-->
+<div class="components-table-demo-control-bar">
+  <form nz-form nzLayout="inline">
+    <div nz-row>
+      <div nz-col nzSpan="12">
+        <nz-breadcrumb>
+          <nz-breadcrumb-item>
+            <i nz-icon type="home"></i>
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            用户管理
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            用户列表
+          </nz-breadcrumb-item>
+        </nz-breadcrumb>
+      </div>
+    </div>
+
+  </form>
+</div>
+<!--查询条件框-->
+<div class="searchGroup">
+  <form nz-form [formGroup]="searchForm" class="ant-advanced-search-form">
+    <div nz-row [nzGutter]="24">
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>用户名</nz-form-label>
+          <nz-form-control>
+            <input nz-input placeholder="用户名" formControlName="username" (change)="getUsers()">
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>是否激活</nz-form-label>
+          <nz-form-control>
+            <nz-cascader [nzOptions]="activeOptions" (nzSelectionChange)="getUsers()"
+                         formControlName="active"></nz-cascader>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>用户角色</nz-form-label>
+          <nz-form-control>
+            <nz-cascader [nzOptions]="roleOptions" (nzSelectionChange)="getUsers()"
+                         formControlName="role"></nz-cascader>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+</div>
+<!--list表单table-->
+<div class="form_table">
+  <nz-table
+    #dynamicTable
+    (nzCurrentPageDataChange)="currentPageDataChange($event)"
+    [nzScroll]="fixHeader?{ y: '240px' }:null"
+    [nzData]="dataSet"
+    [nzBordered]="bordered"
+    [nzSimple]="simple"
+    [nzLoading]="loading"
+    [nzFrontPagination]="pagination"
+    [nzShowPagination]="pagination"
+    [nzSize]="size"
+    [nzPageIndex]="page.pageNum"
+    [nzTotal]="page.totalElements"
+    [nzPageSize]="page.pageSize"
+  >
+    <thead>
+    <tr *ngIf="header">
+      <th nzWidth="62px" nzShowCheckbox *ngIf="checkbox" [(nzChecked)]="allChecked" [nzIndeterminate]="indeterminate"
+          (nzCheckedChange)="checkAll($event)"></th>
+      <th>用户名</th>
+      <th>邮箱</th>
+      <th>电话号码</th>
+      <th>角色</th>
+      <th>是否激活</th>
+      <th>用户创建时间</th>
+      <th>用户创建人</th>
+      <th>
+        <button nz-button (click)="showModal()" nzType="primary" [nzSize]="size"><i nz-icon type="plus"
+                                                                                    theme="outline"></i>增加
+        </button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button (click)="doDels()" nzType="primary" [nzSize]="size"><i nz-icon type="delete"
+                                                                                 theme="outline"></i>批量删除
+        </button>
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-template ngFor let-data [ngForOf]="dynamicTable.data">
+      <tr>
+        <td nzShowCheckbox *ngIf="checkbox" [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+        <td>{{data.username}}</td>
+        <td>{{data.email}}</td>
+        <td>{{data.phone}}</td>
+        <td>
+          <div *ngIf="data.role == 1">系统管理员
+          </div>
+          <div *ngIf="data.role != 1">普通用户
+          </div>
+        </td>
+        <td>
+          <div *ngIf="data.active == 1">是
+            <nz-divider nzType="vertical"></nz-divider>
+            <i nz-icon nzTitle="禁用" (click)="turnOff(data)" nzPlacement="topCenter" nz-tooltip type="pause-circle"
+               theme="outline"></i>
+          </div>
+          <div *ngIf="data.active != 1">否
+            <nz-divider nzType="vertical"></nz-divider>
+            <i nz-icon nzTitle="激活" (click)="turnOn(data)" nzPlacement="topCenter" nz-tooltip type="caret-right"
+               theme="outline"></i>
+          </div>
+        </td>
+        <td>{{data.createDate | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+        <td>{{data.createBy}}</td>
+        <td>
+          <i nz-icon nzTitle="编辑" (click)="showModal(data)" nzPlacement="topCenter" nz-tooltip type="form" theme="outline"
+             class="editIcon"></i>
+          <nz-divider nzType="vertical"></nz-divider>
+          <i nz-icon nzTitle="删除" (click)="doDel(data)" nzPlacement="topCenter" nz-tooltip type="delete" theme="fill"
+             class="delIcon"></i>
+        </td>
+      </tr>
+    </ng-template>
+    </tbody>
+  </nz-table>
+</div>
+
+<!--增加、编辑弹框组件-->
+<div>
+  <nz-modal [(nzVisible)]="isVisible" [nzTitle]="modalTitle" [nzContent]="modalContent" [nzFooter]="modalFooter"
+            (nzOnCancel)="handleCancel()" [nzMaskClosable]="false">
+    <ng-template #modalTitle>
+      {{isNew?'新增用户':'编辑用户'}}
+    </ng-template>
+
+    <ng-template #modalContent>
+      <form nz-form [formGroup]="validateForm" (ngSubmit)="submitForm($event,validateForm.value)">
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>用户名</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <input nz-input formControlName="username" placeholder="用户名">
+            <nz-form-explain
+              *ngIf="validateForm.get('username').dirty && validateForm.get('username').hasError('required')">
+              <span class="valMessage">请输入用户名!</span>
+            </nz-form-explain>
+            <nz-form-explain
+              *ngIf="validateForm.get('username').dirty && validateForm.get('username').hasError('minlength')">
+              <span class="valMessage">用户名的长度必须大于8!</span>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">邮箱</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <input nz-input formControlName="email" placeholder="邮箱" type="email">
+            <nz-form-explain *ngIf="validateForm.get('email').hasError('email')">
+              <span class="valMessage">邮箱格式不正确!</span>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7">电话</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <input nz-input formControlName="phone" placeholder="电话">
+            <nz-form-explain *ngIf="validateForm.get('phone').hasError('notphone')">
+              <span class="valMessage">电话格式不正确!</span>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>是否激活</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <nz-cascader [nzOptions]="activeOptionsAdd" formControlName="active"></nz-cascader>
+            <nz-form-explain *ngIf="validateForm.get('active').hasError('required')">
+              <span class="valMessage">选项不能为空!</span>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="7" nzRequired>用户角色</nz-form-label>
+          <nz-form-control [nzSpan]="12" nzHasFeedback>
+            <nz-cascader [nzOptions]="roleOptionsAdd" formControlName="role"></nz-cascader>
+            <nz-form-explain *ngIf="validateForm.get('role').hasError('required')">
+              <span class="valMessage">选项不能为空!</span>
+            </nz-form-explain>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </ng-template>
+    <ng-template #modalFooter>
+      <button nz-button (click)="resetForm($event)">重置</button>
+      <button nz-button nzType="primary" [disabled]="!validateForm.valid" (click)="doSave()">提交</button>
+    </ng-template>
+  </nz-modal>
+</div>

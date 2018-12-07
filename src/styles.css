@@ -1,0 +1,55 @@
+/* You can add global styles to this file, and also import other style files */
+@charset "UTF-8";
+/*css3-局部动画效果*/
+@import "assets/lib/hover.css";
+
+div.form_table{
+  background-color: #fff;
+  /*box-shadow: 0 0px 15px 0 rgba(0, 0, 0, 0.26);*/
+  border-radius: 10px;
+}
+
+.components-table-demo-control-bar {
+  margin-top: 40px;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+.components-table-demo-control-bar ::ng-deep .ant-form-item {
+  margin-right: 15px;
+  margin-bottom: 8px;
+}
+
+nz-breadcrumb{
+  padding: 10px;
+  font-size: 15px;
+}
+
+div.searchGroup{
+  border-radius: 10px;
+  box-shadow: 0 0px 15px 0 rgba(0, 0, 0, 0.26);
+  background-color: #fff;
+  padding-top: 24px;
+  padding-left: 60px;
+  border-bottom: 2px solid #e8e8e8;
+}
+
+.searchGroup .ant-cascader-menus{
+  height: 66px;
+}
+
+/*校验信息--css*/
+span.valMessage{
+  color: red;
+}
+
+/*删除icon*/
+i.delIcon{
+  font-size: 18px;
+  color: #9a1111;
+}
+/*编辑icon*/
+i.editIcon{
+  font-size: 18px;
+  color: #1261ad;
+}

@@ -1,0 +1,105 @@
+<!--面包屑--当前模块路径-->
+<div class="components-table-demo-control-bar">
+  <form nz-form nzLayout="inline">
+    <div nz-row>
+      <div nz-col nzSpan="12">
+        <nz-breadcrumb>
+          <nz-breadcrumb-item>
+            <i nz-icon type="home"></i>
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            消息管理
+          </nz-breadcrumb-item>
+          <nz-breadcrumb-item>
+            消息列表
+          </nz-breadcrumb-item>
+        </nz-breadcrumb>
+      </div>
+    </div>
+  </form>
+</div>
+<!--查询条件框-->
+<div class="searchGroup">
+  <form nz-form [formGroup]="searchForm" class="ant-advanced-search-form">
+    <div nz-row [nzGutter]="24">
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>消息组织</nz-form-label>
+          <nz-form-control>
+            <nz-cascader [nzOptions]="messageOptions" (nzSelectionChange)="getMessages()"
+                         formControlName="org"></nz-cascader>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>消息类型</nz-form-label>
+          <nz-form-control>
+            <nz-cascader [nzOptions]="messageOptions" (nzSelectionChange)="getMessages()"
+                         formControlName="type"></nz-cascader>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="4">
+        <nz-form-item nzFlex>
+          <nz-form-label>消息级别</nz-form-label>
+          <nz-form-control>
+            <nz-cascader [nzOptions]="levelOptions" (nzSelectionChange)="getMessages()"
+                         formControlName="level"></nz-cascader>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+</div>
+<!--list表单table-->
+<div class="form_table">
+  <nz-table
+    #dynamicTable
+    (nzCurrentPageDataChange)="currentPageDataChange($event)"
+    [nzScroll]="fixHeader?{ y: '240px' }:null"
+    [nzData]="dataSet"
+    [nzBordered]="bordered"
+    [nzSimple]="simple"
+    [nzLoading]="loading"
+    [nzFrontPagination]="pagination"
+    [nzShowPagination]="pagination"
+    [nzSize]="size"
+    [nzPageIndex]="page.pageNum"
+    [nzTotal]="page.totalElements"
+    [nzPageSize]="page.pageSize"
+  >
+    <thead>
+    <tr *ngIf="header">
+      <th nzWidth="62px" nzShowCheckbox *ngIf="checkbox" [(nzChecked)]="allChecked" [nzIndeterminate]="indeterminate"
+          (nzCheckedChange)="checkAll($event)"></th>
+      <th>消息体</th>
+      <th>消息类型</th>
+      <th>消息级别</th>
+      <th>消息创建时间</th>
+      <th>消息创建人</th>
+      <th>消息发送组织</th>
+      <th>响应</th>
+      <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-template ngFor let-data [ngForOf]="dynamicTable.data">
+      <tr>
+        <td nzShowCheckbox *ngIf="checkbox" [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+        <td>{{data.body}}</td>
+        <td>{{data.type}}</td>
+        <td>{{data.level}}</td>
+        <td>{{data.createDate | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+        <td>{{data.username}}</td>
+        <td>{{data.org}}</td>
+        <td>{{data.response}}</td>
+        <td>
+          <i nz-icon nzTitle="删除" (click)="doDel(data)" nzPlacement="topCenter" nz-tooltip type="delete" theme="fill"
+             style="font-size: 18px;color: #9a1111"></i>
+        </td>
+      </tr>
+    </ng-template>
+    </tbody>
+  </nz-table>
+</div>

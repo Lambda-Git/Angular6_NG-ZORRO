@@ -1,0 +1,78 @@
+<nz-layout class="layout">
+  <nz-header>
+    <div class="logo">
+      <img src="../../assets/images/banner.png" height="40" title="MaxChain Tech">
+    </div>
+
+    <ul nz-menu [nzMode]="'horizontal'">
+      <li class="home" nz-menu-item [routerLinkActive]="['active']">
+        <a [routerLink]="['/saas/auth/overview']"><i nz-icon type="home" theme="outline"></i>首页</a>
+      </li>
+      <li nz-submenu>
+        <span class="titles" title><i nz-icon type="qrcode" theme="outline"></i>配置管理</span>
+        <ul>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/config/host']"><i nz-icon type="qrcode" theme="outline"></i>配置主机</a>
+          </li>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/config/identity']"><i nz-icon type="qrcode" theme="outline"></i>配置身份</a>
+          </li>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/config/channel']"><i nz-icon type="qrcode" theme="outline"></i>配置通道</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu>
+        <span class="titles" title><i nz-icon type="box-plot" theme="outline"></i>容器配置管理</span>
+        <ul>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/config/container']"><i nz-icon type="box-plot" theme="outline"></i>配置容器</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu>
+        <span class="titles" title><i nz-icon type="message" theme="outline"></i>消息管理</span>
+        <ul>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/message/list']"><i nz-icon type="message" theme="outline"></i>消息列表</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu>
+        <span class="titles" title><i nz-icon type="database" theme="outline"></i>数据</span>
+        <ul>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/browser/channel']"><i nz-icon type="database" theme="outline"></i>通道</a>
+          </li>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/browser/chaincode']"><i nz-icon type="database" theme="outline"></i>合约</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu>
+        <span class="titles" title><i nz-icon type="user-add" theme="outline"></i>用户管理</span>
+        <ul>
+          <li nz-menu-item [routerLinkActive]="['active']">
+            <a [routerLink]="['/saas/auth/user/list']"><i nz-icon type="usergroup-add" theme="outline"></i>用户列表</a>
+          </li>
+        </ul>
+      </li>
+      <li class="userInfo" nz-submenu>
+        <span title><i nz-icon type="user" style="font-size:25px;color: #FFFFFF"></i>Admin123</span>
+        <ul>
+          <li nz-menu-item>
+            <a (click)="changePassword()"><i nz-icon type="key"></i>修改密码</a>
+          </li>
+          <li nz-menu-item>
+            <a (click)="logout()"><i nz-icon type="logout"></i>退出</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+
+  </nz-header>
+  <div class='saas-peer-body'>
+    <router-outlet></router-outlet>
+  </div>
+</nz-layout>
